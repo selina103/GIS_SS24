@@ -119,3 +119,22 @@ img{
     color: #6b6fed;
     font-weight: bold;
 }
+
+.detail-container {
+    align-items: center;
+    text-align: center;
+}
+
+.delete-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: rgb(115, 232, 140);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: rgb(35, 88, 10);
+}
