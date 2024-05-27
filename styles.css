@@ -126,6 +126,7 @@ img{
 }
 
 .delete-btn {
+    align-items: center;
     margin-top: 20px;
     padding: 10px 20px;
     background-color: rgb(115, 232, 140);
@@ -138,3 +139,17 @@ img{
 .delete-btn:hover {
     background-color: rgb(35, 88, 10);
 }
+
+.speichern-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: rgb(115, 232, 140);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.speichern-btn:hover {
+    background-color: rgb(35, 88, 10);
+}
+
