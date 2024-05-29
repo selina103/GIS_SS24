@@ -1,3 +1,4 @@
+// JavaScript wird erst ausgeführt, wenn das gesamte HTML-Dokument vollständig geladen wurde 
 document.addEventListener('DOMContentLoaded', () => {
     let form = document.getElementById('Kleidungsform');
 

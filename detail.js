@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Holt das Kleidungsstück anhand der Kategorie und ID. Falls nicht vorhanden, wird null zurückgegeben
     let item = kleidung[kategorie] ? kleidung[kategorie][id] : null;
 
-    // Falls das Kleidungsstück existiert, zeige die Details an
+    // Falls das Kleidungsstück existiert, zeigt es die Details an
     if (item) {
         console.log('Ausgewähltes Kleidungsstück:', item);
         // Holt das DIV-Element mit der ID 'KleidungsDetails'
