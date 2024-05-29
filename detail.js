@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p><strong>Kategorie:</strong> ${item.kategorie}</p>
             <p><strong>Größe:</strong> ${item.size}</p>
             <p><strong>Preis:</strong> €${item.price}</p>
+            <button class="delete-btn">Löschen</button>
         `;
 
         // Fügt einen Event-Listener zum Löschen-Button hinzu
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Speichert die aktualisierte Kleidungsstück-Liste im LocalStorage
                 localStorage.setItem('kleidung', JSON.stringify(kleidung)); 
                 // Leitet zur Kategorieseite weiter
-                window.location.href = `${kategorie}.html`; 
+                window.location.href = `Kategorien/${kategorie}.html`; 
             }
         });
         // Falls das Kleidungsstück nicht gefunden wird, gibt eine Fehlermeldung in der Konsole aus
