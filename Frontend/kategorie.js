@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Holt das UL-Element mit der ID 'KleidungsListe'
     let kleidungsListe = document.getElementById('KleidungsListe');
     // Holt den Pfadnamen der aktuellen URL
@@ -9,8 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Gibt die aktuelle Kategorie in der Konsole aus
     console.log('Aktuelle Kategorie:', kategorie);
 
-    // Holt die bestehende Kleidungsstück-Liste aus dem LocalStorage
-    let kleidung = JSON.parse(localStorage.getItem('kleidung')) || {};
+    try {
+        // Holt die Kleidungsstück-Liste aus dem Backend
+        const response = await fetch(`http://localhost:3000/data?kategorie=${kategorie}`);
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        const kleidung = await response.json();
 
     // Gibt die geladene Kleidungsstück-Liste in der Konsole aus
     console.log('Geladene Kleidungsstücke:', kleidung);
@@ -29,4 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fügt das LI-Element der Kleidungsstück-Liste (UL) hinzu
         kleidungsListe.appendChild(listItem);
     });
+} catch (error) {
+    console.error('Fehler beim Abrufen der Kleidungsstücke:', error);
+}
 });

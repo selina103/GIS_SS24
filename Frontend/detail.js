@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Holt die URL-Parameter der aktuellen Seite
     let params = new URLSearchParams(window.location.search);
     // Extrahiert den 'kategorie' und 'id' Parameter aus der URL
@@ -8,10 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Gibt die aktuelle Kategorie und ID in der Konsole aus.
     console.log('Kategorie:', kategorie, 'ID:', id);
 
-    // Holt die bestehende Kleidungsstück-Liste aus dem LocalStorage
-    let kleidung = JSON.parse(localStorage.getItem('kleidung')) || {};
-    // Holt das Kleidungsstück anhand der Kategorie und ID. Falls nicht vorhanden, wird null zurückgegeben
-    let item = kleidung[kategorie] ? kleidung[kategorie][id] : null;
+    try {
+        // Holt das Kleidungsstück anhand der Kategorie und ID vom Backend
+        const response = await fetch(`http://localhost:3000/data?kategorie=${kategorie}&id=${id}`);
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        const item = await response.json();
 
     // Falls das Kleidungsstück existiert, zeigt es die Details an
     if (item) {
@@ -33,18 +36,28 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         // Fügt einen Event-Listener zum Löschen-Button hinzu
-        document.querySelector('.delete-btn').addEventListener('click', () => {
+        document.querySelector('.delete-btn').addEventListener('click', async () => {
             if (confirm('Möchten Sie dieses Kleidungsstück wirklich löschen?')) {
-                // Entfernt das Kleidungsstück aus der Kategorie
-                kleidung[kategorie].splice(id, 1); 
-                // Speichert die aktualisierte Kleidungsstück-Liste im LocalStorage
-                localStorage.setItem('kleidung', JSON.stringify(kleidung)); 
-                // Leitet zur Kategorieseite weiter
-                window.location.href = `Kategorien/${kategorie}.html`; 
+                try {
+                    const deleteResponse = await fetch(`http://localhost:3000/data/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!deleteResponse.ok) {
+                        throw new Error('Fehler beim Löschen des Kleidungsstücks');
+                    }
+
+                    // Leitet zur Kategorieseite weiter
+                    window.location.href = `Kategorien/${kategorie}.html`; 
+                } catch (error) {
+                    console.error('Fehler beim Löschen des Kleidungsstücks:', error);
+                }
             }
         });
-        // Falls das Kleidungsstück nicht gefunden wird, gibt eine Fehlermeldung in der Konsole aus
     } else {
         console.error('Kleidungsstück nicht gefunden.');
     }
+} catch (error) {
+    console.error('Fehler beim Abrufen des Kleidungsstücks:', error);
+}
 });
