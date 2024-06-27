@@ -1,49 +1,54 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const cors = require('cors');
-
+const path = require('path');
 const app = express();
-const port = 3000;
+const PORT = 3001; // Ändern der Portnummer hier
 
-// Middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(express.static(path.join(__dirname, '../Frontend'))); // Statische Dateien aus dem Frontend-Verzeichnis bedienen
 
-// Verbindung zur MongoDB herstellen
-const mongoURI = 'mongodb+srv://selakie:sesek8+TBSML@digitalerkleiderschrank.yyu4wm4.mongodb.net/?retryWrites=true&w=majority&appName=digitalerKleiderschrank'; // Ersetzen Sie dies durch Ihren korrekten URI
+// Route für die Startseite
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/index.html'));
+});
 
-mongoose.connect(mongoURI)
-  .then(() => {
-    console.log('Verbunden mit der MongoDB-Datenbank');
-  })
-  .catch((error) => {
-    console.error('Verbindungsfehler:', error);
-  });
+// Route für Kategorien (Beispiel: Hosen, Jacken, Pullover, etc.)
+app.get('/kategorien/:kategorie', (req, res) => {
+    res.sendFile(path.join(__dirname, `../Frontend/Kategorien/${req.params.kategorie}.html`));
+});
 
-// Schema und Modell
+
+mongoose.connect('mongodb+srv://selakie:<sesek8+TBSML>@clustergis.nmf5k87.mongodb.net/?retryWrites=true&w=majority&appName=ClusterGIS', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
+
 const kleidungsstueckSchema = new mongoose.Schema({
-  bild: String,
-  kategorie: String,
-  beschreibung: String,
-  size: String,
-  price: Number,
+    bild: String,
+    kategorie: String,
+    beschreibung: String,
+    size: String,
+    price: Number,
 });
 
 const Kleidungsstueck = mongoose.model('Kleidungsstueck', kleidungsstueckSchema);
 
-// Routen
 app.post('/data', async (req, res) => {
-  try {
-    const kleidungsstueck = new Kleidungsstueck(req.body);
-    await kleidungsstueck.save();
-    res.status(201).send('Kleidungsstück erfolgreich gespeichert');
-  } catch (error) {
-    res.status(500).send('Fehler beim Speichern des Kleidungsstücks');
-  }
+    try {
+        const kleidungsstueck = new Kleidungsstueck(req.body);
+        await kleidungsstueck.save();
+        res.status(200).send('Kleidungsstück erfolgreich gespeichert');
+    } catch (error) {
+        res.status(500).send('Fehler beim Speichern des Kleidungsstückes');
+    }
 });
 
-// Server starten
-app.listen(port, () => {
-  console.log(`Server läuft auf http://localhost:${port}`);
+// Route für die Startseite
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/index.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`Server läuft auf http://localhost:${PORT}`);
 });
