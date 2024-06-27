@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // Holt die URL-Parameter der aktuellen Seite
     let params = new URLSearchParams(window.location.search);
-    let id = params.get('id');
+    let id = params.get('id');  // Stellt sicher, dass die ID aus der URL extrahiert wird
 
     try {
-        let response = await fetch(`http://localhost:3001/data/${id}`, {
+        // Sendet eine GET-Anfrage an das Backend, um das Kleidungsstück mit der gegebenen ID abzurufen
+        let response = await fetch(`http://localhost:3006/kleidungsstueck/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -12,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (response.ok) {
-            let item = await response.json();
+            let item = await response.json();  // Parst die JSON-Antwort
 
             // Gibt das ausgewählte Kleidungsstück in der Konsole aus
             console.log('Ausgewähltes Kleidungsstück:', item);
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.querySelector('.delete-btn').addEventListener('click', async () => {
                 if (confirm('Möchten Sie dieses Kleidungsstück wirklich löschen?')) {
                     try {
-                        let deleteResponse = await fetch(`http://localhost:3001/data/${id}`, {
+                        let deleteResponse = await fetch(`http://localhost:3006/kleidungsstueck/${id}`, {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -46,6 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                         if (deleteResponse.ok) {
                             alert('Kleidungsstück erfolgreich gelöscht');
+                            // Leitet zurück zur Kategorie-Seite weiter
                             window.location.href = `kategorie.html?kategorie=${item.kategorie}`;
                         } else {
                             console.error('Fehler beim Löschen des Kleidungsstücks');

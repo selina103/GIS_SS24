@@ -1,13 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const port = 3000;
+const port = 3006;
 
 app.use(bodyParser.json());
 
 let kleidung = [];
 
-app.post('/data', (req, res) => {
+app.post('/kleidungsstueck', (req, res) => {
     console.log('Empfangene Daten:', req.body);
     const { bild, kategorie, beschreibung, size, price } = req.body;
 

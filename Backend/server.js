@@ -1,87 +1,101 @@
-//const express = require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
 
-//const app = express();
-const PORT = 3006;
+const app = express();
+const port = 3006;
 
+// Middleware
 app.use(bodyParser.json());
+app.use(express.static('Frontend')); // Statisches Verzeichnis für Frontend-Dateien
 
-// Verbindung zur SQLite-Datenbank herstellen
+// Datenbank initialisieren
 const db = new sqlite3.Database('./myDatabase.db', (err) => {
     if (err) {
-        console.error('Fehler beim Verbinden zur Datenbank:', err);
+        console.error('Fehler beim Öffnen der Datenbank:', err.message);
     } else {
         console.log('Verbunden mit der SQLite-Datenbank');
+        db.run(`CREATE TABLE IF NOT EXISTS kleidungsstueck (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            bild TEXT,
+            kategorie TEXT,
+            beschreibung TEXT,
+            size TEXT,
+            price REAL
+        )`);
     }
 });
 
-// Tabelle für Kleidungsstücke erstellen, falls sie nicht existiert
-db.run(`
-    CREATE TABLE IF NOT EXISTS kleidungsstueck (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        bild TEXT,
-        kategorie TEXT,
-        beschreibung TEXT,
-        size TEXT,
-        price REAL
-    )
-`);
-
 // Endpunkt zum Hinzufügen eines Kleidungsstücks
-app.post('/data', (req, res) => {
+app.post('/kleidungsstueck', (req, res) => {
     const { bild, kategorie, beschreibung, size, price } = req.body;
-    const query = `
-        INSERT INTO kleidungsstueck (bild, kategorie, beschreibung, size, price)
-        VALUES (?, ?, ?, ?, ?)
-    `;
+    const query = `INSERT INTO kleidungsstueck (bild, kategorie, beschreibung, size, price) VALUES (?, ?, ?, ?, ?)`;
     db.run(query, [bild, kategorie, beschreibung, size, price], function(err) {
         if (err) {
-            console.error('Fehler beim Speichern des Kleidungsstücks:', err);
-            res.status(500).send('Fehler beim Speichern des Kleidungsstücks');
+            console.error('Fehler beim Hinzufügen des Kleidungsstücks:', err.message);
+            res.status(500).send('Fehler beim Hinzufügen des Kleidungsstücks');
         } else {
-            res.status(200).send({ id: this.lastID, ...req.body });
+            res.status(201).json({ id: this.lastID });
         }
     });
 });
 
-// Statisches Hosting der HTML-Dateien
-//app.use(express.static(path.join(__dirname, '../Frontend')));
+// Endpunkt zum Abrufen aller Kleidungsstücke oder nach Kategorie
+app.get('/kleidungsstueck', (req, res) => {
+    const { kategorie } = req.query;
+    let query = 'SELECT * FROM kleidungsstueck';
+    let params = [];
 
-// Route für den Root-Pfad
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../Frontend', 'index.html'));
+    if (kategorie) {
+        query += ' WHERE kategorie = ?';
+        params.push(kategorie);
+    }
+
+    db.all(query, params, (err, rows) => {
+        if (err) {
+            console.error('Fehler beim Abrufen der Kleidungsstücke:', err.message);
+            res.status(500).send('Fehler beim Abrufen der Kleidungsstücke');
+        } else {
+            res.json(rows);
+        }
+    });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server läuft auf http://localhost:${PORT}`);
-});
-
-// Endpunkt zum Abrufen eines einzelnen Kleidungsstücks basierend auf der ID
-app.get('/data/:id', (req, res) => {
-    const id = req.params.id;
-    const query = `SELECT * FROM kleidungsstueck WHERE id = ?`;
+// Endpunkt zum Abrufen eines einzelnen Kleidungsstücks nach ID
+app.get('/kleidungsstueck/:id', (req, res) => {
+    const { id } = req.params;
+    const query = 'SELECT * FROM kleidungsstueck WHERE id = ?';
+    
     db.get(query, [id], (err, row) => {
         if (err) {
-            console.error('Fehler beim Abrufen des Kleidungsstücks:', err);
+            console.error('Fehler beim Abrufen des Kleidungsstücks:', err.message);
             res.status(500).send('Fehler beim Abrufen des Kleidungsstücks');
+        } else if (!row) {
+            res.status(404).send('Kleidungsstück nicht gefunden');
         } else {
-            res.status(200).json(row);
+            res.json(row);
         }
     });
 });
 
-// Endpunkt zum Löschen eines einzelnen Kleidungsstücks basierend auf der ID
-app.delete('/data/:id', (req, res) => {
-    const id = req.params.id;
-    const query = `DELETE FROM kleidungsstueck WHERE id = ?`;
+// Endpunkt zum Löschen eines Kleidungsstücks nach ID
+app.delete('/kleidungsstueck/:id', (req, res) => {
+    const { id } = req.params;
+    const query = 'DELETE FROM kleidungsstueck WHERE id = ?';
+    
     db.run(query, [id], function(err) {
         if (err) {
-            console.error('Fehler beim Löschen des Kleidungsstücks:', err);
+            console.error('Fehler beim Löschen des Kleidungsstücks:', err.message);
             res.status(500).send('Fehler beim Löschen des Kleidungsstücks');
+        } else if (this.changes === 0) {
+            res.status(404).send('Kleidungsstück nicht gefunden');
         } else {
-            res.status(200).send(`Kleidungsstück mit ID ${id} erfolgreich gelöscht`);
+            res.status(200).send('Kleidungsstück erfolgreich gelöscht');
         }
     });
+});
+
+// Server starten
+app.listen(port, () => {
+    console.log(`Server läuft auf http://localhost:${port}`);
 });
