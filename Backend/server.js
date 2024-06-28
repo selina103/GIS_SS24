@@ -17,12 +17,12 @@ const db = new sqlite3.Database('./myDatabase.db', (err) => {
         console.log('Verbunden mit der SQLite-Datenbank');
         // Tabelle für Kleidungsstücke erstellen, falls sie noch nicht existiert
         db.run(`CREATE TABLE IF NOT EXISTS kleidungsstueck (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, // Primärschlüssel, der automatisch inkrementiert wird
-            bild TEXT, // Bild-URL des Kleidungsstücks
-            kategorie TEXT, // Kategorie des Kleidungsstücks (z.B. T-Shirt, Hose)
-            beschreibung TEXT, // Beschreibung des Kleidungsstücks
-            size TEXT, // Größe des Kleidungsstücks
-            price REAL // Preis des Kleidungsstücks
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            bild TEXT, 
+            kategorie TEXT, 
+            beschreibung TEXT, 
+            size TEXT, 
+            price REAL 
         )`);
     }
 });
@@ -80,7 +80,7 @@ app.get('/kleidungsstueck/:id', (req, res) => {
         } else if (!row) {
             res.status(404).send('Kleidungsstück nicht gefunden'); // Fehlermeldung, wenn das Kleidungsstück nicht gefunden wurde
         } else {
-            res.json(row); // Sendet das gefundene Kleidungsstück als JSON zurück
+            res.json(row); // Sendet das gefundene Kleidungsstück als JSON zurück ins Fronted
         }
     });
 });

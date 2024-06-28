@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (deleteResponse.ok) {
                             alert('Kleidungsstück erfolgreich gelöscht');
                             // Leitet zurück zur Kategorie-Seite weiter
-                            window.location.href = `kategorie.html?kategorie=${item.kategorie}`;
+                            window.location.href = `Kategorien/${item.kategorie}.html`;
                         } else {
                             console.error('Fehler beim Löschen des Kleidungsstücks');
                         }
